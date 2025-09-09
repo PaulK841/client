@@ -239,7 +239,7 @@ const captureOrder = async (req, res, next) => {
         }
         
         user.subscriptionExpiresAt = newExpirationDate;
-        user.subscriptionStatus = 'active';
+        user.subscriptionStatus = 'confirmed';
         
         // Ajouter l'historique de paiement
         if (!user.paymentHistory) {

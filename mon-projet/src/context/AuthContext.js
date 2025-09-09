@@ -23,7 +23,8 @@ export const AuthProvider = ({ children }) => {
         id: response.data._id,
         username: response.data.username, 
         email: response.data.email,
-        subscriptionExpiresAt: response.data.subscriptionExpiresAt
+        subscriptionExpiresAt: response.data.subscriptionExpiresAt,
+        subscriptionStatus: response.data.subscriptionStatus
       };
       
       setUser(userData);
@@ -41,7 +42,8 @@ export const AuthProvider = ({ children }) => {
         id: response.data._id,
         username: response.data.username,
         email: response.data.email,
-        subscriptionExpiresAt: response.data.subscriptionExpiresAt
+        subscriptionExpiresAt: response.data.subscriptionExpiresAt,
+        subscriptionStatus: response.data.subscriptionStatus
       };
       
       setUser(userData);
@@ -72,6 +74,7 @@ export const AuthProvider = ({ children }) => {
         username: data.username,
         email: data.email,
         subscriptionExpiresAt: data.subscriptionExpiresAt,
+        subscriptionStatus: data.subscriptionStatus,
       };
       setUser(userData);
       localStorage.setItem('user', JSON.stringify(userData));

@@ -1,4 +1,6 @@
 // controllers/userController.js
+const User = require('../models/User');
+
 const getUserProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
@@ -8,6 +10,7 @@ const getUserProfile = async (req, res, next) => {
         username: user.username,
         email: user.email,
         subscriptionExpiresAt: user.subscriptionExpiresAt,
+        subscriptionStatus: user.subscriptionStatus,
       });
     } else {
       res.status(404);
@@ -16,4 +19,8 @@ const getUserProfile = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+module.exports = {
+  getUserProfile,
 };

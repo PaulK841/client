@@ -22,6 +22,11 @@ const userSchema = mongoose.Schema(
     subscriptionExpiresAt: {
       type: Date, // Stocke la date exacte d'expiration
     },
+    subscriptionStatus: {
+      type: String,
+      enum: ['inactive', 'confirmed', 'expired'],
+      default: 'inactive'
+    },
   },
   {
     timestamps: true,

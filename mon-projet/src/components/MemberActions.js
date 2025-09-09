@@ -11,9 +11,9 @@ const DiscordIcon = () => (
 
 
 const MemberActions = () => {
-    // IMPORTANT: Remplacez '#' par vos vrais liens ici
-    const downloadLink = "#";
-    const discordLink = "#";
+    // Liens pour les membres confirmés
+    const downloadLink = "/api/download/latest";
+    const discordLink = import.meta.env.VITE_DISCORD_INVITE_URL || "https://discord.gg/your-invite-code";
 
     return (
         <div className="member-actions">

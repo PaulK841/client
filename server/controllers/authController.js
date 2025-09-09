@@ -52,6 +52,7 @@ const registerUser = async (req, res, next) => {
         username: user.username,
         email: user.email,
         subscriptionExpiresAt: user.subscriptionExpiresAt,
+        subscriptionStatus: user.subscriptionStatus,
         token: generateToken(user._id),
       });
     } else {
@@ -90,6 +91,7 @@ const loginUser = async (req, res, next) => {
         username: user.username,
         email: user.email,
         subscriptionExpiresAt: user.subscriptionExpiresAt,
+        subscriptionStatus: user.subscriptionStatus,
         token: generateToken(user._id),
       });
     } else {

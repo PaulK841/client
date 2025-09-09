@@ -278,6 +278,10 @@ section { padding: 6rem 0; }
 .subscription-status.active {
   background-color: var(--success-color);
 }
+.subscription-status.pending {
+  background-color: #ffa500;
+  color: #000;
+}
 .subscription-status.inactive {
   background-color: var(--error-color);
 }

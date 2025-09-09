@@ -1,6 +1,24 @@
-# Getting Started with Create React App
+# AimGuard Client Application
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## 🚀 Nouvelles Fonctionnalités Ajoutées
+
+### Système de Confirmation d'Abonnement
+
+- **Statut "Confirmé"** : Après un paiement réussi via PayPal, l'abonnement passe automatiquement à l'état "confirmé"
+- **Accès Discord** : Les membres avec un abonnement confirmé ont accès au serveur Discord communautaire
+- **Téléchargement du Logiciel** : Les membres confirmés peuvent télécharger la dernière version d'AimGuard
+- **Interface Visuelle** : Différents statuts d'abonnement avec des indicateurs colorés (Confirmé/En attente/Inactif)
+
+### Configuration
+
+Créez un fichier `.env` dans le répertoire `mon-projet/` avec :
+
+```
+# URL d'invitation Discord pour les membres
+VITE_DISCORD_INVITE_URL=https://discord.gg/your-invite-code
+```
 
 ## Available Scripts
 

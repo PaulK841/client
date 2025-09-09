@@ -38,7 +38,9 @@ const ProfilePage = () => {
   const isSubscribed = useMemo(() => {
     if (!user || !user.subscriptionExpiresAt) return false;
     const exp = new Date(user.subscriptionExpiresAt);
-    return !Number.isNaN(exp.getTime()) && exp.getTime() > Date.now();
+    const isNotExpired = !Number.isNaN(exp.getTime()) && exp.getTime() > Date.now();
+    const isConfirmed = user.subscriptionStatus === 'confirmed';
+    return isNotExpired && isConfirmed;
   }, [user]);
 
   const expirationDate = useMemo(() => {
@@ -74,7 +76,9 @@ const ProfilePage = () => {
           <div className="profile-detail-item">
             <strong>Subscription:</strong>
             {isSubscribed ? (
-              <span className="subscription-status active">Active until {expirationDate}</span>
+              <span className="subscription-status active">Confirmed - Active until {expirationDate}</span>
+            ) : user?.subscriptionExpiresAt && user?.subscriptionStatus !== 'confirmed' ? (
+              <span className="subscription-status pending">Payment pending confirmation</span>
             ) : (
               <span className="subscription-status inactive">Inactive / Expired</span>
             )}
