@@ -10,8 +10,8 @@ const PricingPage = () => {
     <div className="pricing-page">
       <div className="pricing-card fade-in-section is-visible">
         <div className="pricing-header">
-          <h2>AimGuard - Lifetime Access</h2>
-          <p>One-time payment for our complete hardware and software solution.</p>
+          <h2>AimGuard Starter Pack</h2>
+          <p>Your one-time purchase to get everything you need to dominate.</p>
         </div>
 
         <div className="price-display">
@@ -22,23 +22,23 @@ const PricingPage = () => {
 
         <ul className="features-list">
           <li>✓ Hand-Crafted Hardware Device</li>
-          <li>✓ Intuitive Companion Software</li>
+          <li>✓ First Month of Software Access</li>
           <li>✓ Undetected & Secure</li>
-          <li>✓ Lifetime Updates</li>
-          <li>✓ 24/7 Support</li>
+          <li>✓ Lifetime Hardware Warranty</li>
         </ul>
 
+        <p className="renewal-info">After the first month, the software subscription renews at just €9.99/month.</p>
+
         {token ? (
-          // Si l'utilisateur est connecté, afficher le paiement
           <div className="payment-section">
-            <h3>Complete Your Secure Purchase</h3>
-            <PayPalButton />
+            <h3>Complete Your Purchase</h3>
+            {/* On spécifie que c'est un achat initial */}
+            <PayPalButton purchaseType="initial" />
           </div>
         ) : (
-          // Sinon, afficher l'invitation à se connecter
           <div className="login-prompt">
-            <h3>You're almost there!</h3>
-            <p>Please log in or create an account to complete your purchase.</p>
+            <h3>Get Started</h3>
+            <p>Log in or create an account to purchase the AimGuard Starter Pack.</p>
             <div className="prompt-buttons">
               <Link to="/login" className="auth-button">Login</Link>
               <Link to="/register" className="secondary-button">Register</Link>

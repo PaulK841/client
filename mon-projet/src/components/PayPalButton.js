@@ -4,13 +4,15 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
-const PayPalButton = () => {
+// Le composant accepte maintenant une prop 'purchaseType'
+const PayPalButton = ({ purchaseType }) => {
     const navigate = useNavigate();
-    const { updateUserSubscriptionStatus } = useAuth();
+    const { updateUserSubscription } = useAuth();
 
     const createOrder = async () => {
         try {
-            const response = await api.post('/paypal/orders');
+            // On envoie le type d'achat au backend
+            const response = await api.post('/paypal/orders', { purchaseType });
             return response.data.id;
         } catch (error) {
             console.error("Error creating PayPal order", error);
@@ -21,19 +23,17 @@ const PayPalButton = () => {
 
     const onApprove = async (data) => {
         try {
-            await api.post(`/paypal/orders/${data.orderID}/capture`);
-            updateUserSubscriptionStatus();
+            const response = await api.post(`/paypal/orders/${data.orderID}/capture`);
+            if (response.data.subscriptionExpiresAt) {
+              updateUserSubscription(response.data.subscriptionExpiresAt);
+            }
             navigate('/success');
         } catch (error) {
-            console.error("Error capturing PayPal order", error);
              navigate('/cancel');
         }
     };
     
-    const onCancel = () => {
-        console.log("Payment cancelled by user.");
-        navigate('/cancel');
-    };
+    const onCancel = () => { /* ... inchangé ... */ };
 
     return (
         <div style={{ maxWidth: '750px', minHeight: '200px', margin: '2rem auto' }}>
