@@ -22,16 +22,17 @@ export const AuthProvider = ({ children }) => {
       const userData = { 
         id: response.data._id,
         username: response.data.username, 
-        email: response.data.email 
+        email: response.data.email,
+        isSubscribed: response.data.isSubscribed
       };
       
-      setToken(response.data.token);
       setUser(userData);
+      setToken(response.data.token);
 
-      localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('token', response.data.token);
       
-      navigate('/dashboard');
+      navigate('/profile');
     } catch (error) {
       console.error("Login failed", error);
       throw error;
@@ -44,16 +45,17 @@ export const AuthProvider = ({ children }) => {
       const userData = { 
         id: response.data._id,
         username: response.data.username,
-        email: response.data.email 
+        email: response.data.email,
+        isSubscribed: response.data.isSubscribed
       };
       
-      setToken(response.data.token);
       setUser(userData);
+      setToken(response.data.token);
       
-      localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('token', response.data.token);
 
-      navigate('/dashboard');
+      navigate('/profile');
     } catch (error) {
       console.error("Registration failed", error);
       throw error;
@@ -68,7 +70,15 @@ export const AuthProvider = ({ children }) => {
     navigate('/login');
   };
 
-  const value = { user, token, login, register, logout };
+  const updateUserSubscriptionStatus = () => {
+    if (user) {
+      const updatedUser = { ...user, isSubscribed: true };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+    }
+  };
+
+  const value = { user, token, login, register, logout, updateUserSubscriptionStatus };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

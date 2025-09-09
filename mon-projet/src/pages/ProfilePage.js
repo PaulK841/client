@@ -5,13 +5,8 @@ import { useAuth } from '../context/AuthContext';
 const ProfilePage = () => {
   const { user } = useAuth();
 
-  // Affiche un message de chargement si les informations ne sont pas prêtes
   if (!user) {
-    return (
-      <div className="dashboard-page">
-        <p>Loading profile...</p>
-      </div>
-    );
+    return <div className="dashboard-page"><p>Loading profile...</p></div>;
   }
 
   return (
@@ -29,14 +24,21 @@ const ProfilePage = () => {
           </div>
           <div className="profile-detail-item">
             <strong>Subscription:</strong>
-            <span className="subscription-status inactive">Inactive</span>
+            {user.isSubscribed ? (
+              <span className="subscription-status active">Active</span>
+            ) : (
+              <span className="subscription-status inactive">Inactive</span>
+            )}
           </div>
         </div>
-        <div className="profile-actions">
-          <h2>Get AimGuard</h2>
-          <p>If you haven't purchased yet, get lifetime access now!</p>
-          <Link to="/dashboard" className="auth-button">Purchase Now</Link>
-        </div>
+
+        {!user.isSubscribed && (
+          <div className="profile-actions">
+            <h2>Get AimGuard</h2>
+            <p>You currently don't have an active subscription. Get lifetime access now!</p>
+            <Link to="/pricing" className="auth-button">View Pricing</Link>
+          </div>
+        )}
       </div>
     </div>
   );

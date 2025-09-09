@@ -2,9 +2,11 @@ import React from 'react';
 import { PayPalButtons } from "@paypal/react-paypal-js";
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const PayPalButton = () => {
     const navigate = useNavigate();
+    const { updateUserSubscriptionStatus } = useAuth();
 
     const createOrder = async () => {
         try {
@@ -19,8 +21,8 @@ const PayPalButton = () => {
 
     const onApprove = async (data) => {
         try {
-            const response = await api.post(`/paypal/orders/${data.orderID}/capture`);
-            console.log("Payment successful:", response.data);
+            await api.post(`/paypal/orders/${data.orderID}/capture`);
+            updateUserSubscriptionStatus();
             navigate('/success');
         } catch (error) {
             console.error("Error capturing PayPal order", error);

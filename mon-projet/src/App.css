@@ -266,3 +266,18 @@ section { padding: 6rem 0; }
   background-color: var(--border-color);
   border-color: var(--secondary-color);
 }
+
+/* --- STYLES POUR LE STATUT D'ABONNEMENT --- */
+.subscription-status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: white;
+}
+.subscription-status.active {
+  background-color: var(--success-color);
+}
+.subscription-status.inactive {
+  background-color: var(--error-color);
+}
