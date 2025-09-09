@@ -1,4 +1,4 @@
-// This must be the VERY FIRST line for environment variables to be available everywhere
+// Doit être la TOUTE PREMIÈRE ligne pour que les variables soient disponibles partout
 require('dotenv').config();
 
 const express = require('express');
@@ -6,26 +6,33 @@ const cors = require('cors');
 const connectDB = require('./config/db.js');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware.js');
 
-// Import routes
+// Importer les routes
 const authRoutes = require('./routes/authRoutes.js');
 const paypalRoutes = require('./routes/paypalRoutes.js');
-const userRoutes = require('./routes/userRoutes.js'); // <-- IMPORT NEW ROUTES
+const userRoutes = require('./routes/userRoutes.js');
 
-// Start database connection
+// Démarrer la connexion à la base de données
 connectDB();
 
 const app = express();
 
-// Base middlewares
+// Middlewares de base
 app.use(cors());
-app.use(express.json()); // To make the server understand JSON sent by the frontend
+app.use(express.json());
 
-// API Routes
+// --- ROUTE DE HEALTH CHECK AJOUTÉE ---
+// Pour répondre positivement aux services de surveillance comme Render
+app.get('/', (req, res) => {
+    res.send('API is healthy and running!');
+});
+// ------------------------------------
+
+// Routes de l'API (tout ce qui commence par /api)
 app.use('/api/auth', authRoutes);
 app.use('/api/paypal', paypalRoutes);
-app.use('/api/users', userRoutes); // <-- USE NEW ROUTES
+app.use('/api/users', userRoutes);
 
-// Error handling middlewares
+// Middlewares de gestion d'erreurs (doivent être à la fin)
 app.use(notFound);
 app.use(errorHandler);
 
