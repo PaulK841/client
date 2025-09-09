@@ -281,3 +281,84 @@ section { padding: 6rem 0; }
 .subscription-status.inactive {
   background-color: var(--error-color);
 }
+
+/* ... (tous vos styles précédents) ... */
+
+/* --- NOUVEAUX STYLES POUR LA PAGE DE SUCCÈS --- */
+.success-card {
+  background-color: var(--card-background);
+  backdrop-filter: blur(5px);
+  padding: 3rem;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  width: 100%;
+  max-width: 700px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.success-card h2 {
+  color: var(--success-color);
+  font-size: 2.2rem;
+  margin-top: 0;
+}
+
+.success-card > p {
+  color: var(--secondary-color);
+  margin-bottom: 3rem;
+  font-size: 1.1rem;
+}
+
+.next-steps {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.step-card {
+  background-color: var(--background-start);
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.step-icon {
+  background-color: var(--accent-color);
+  color: var(--background-start);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.step-card h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.step-card p {
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+  min-height: 40px; /* Pour aligner les boutons */
+}
+
+.step-card .auth-button, .step-card .secondary-button {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.back-link {
+  color: var(--secondary-color);
+  margin-top: 1rem;
+  display: inline-block;
+}
+
+@media (max-width: 600px) {
+  .next-steps {
+    grid-template-columns: 1fr;
+  }
+}
