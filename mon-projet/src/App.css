@@ -362,3 +362,57 @@ section { padding: 6rem 0; }
     grid-template-columns: 1fr;
   }
 }
+
+/* ... (tous vos styles précédents) ... */
+
+/* --- STYLES POUR L'ESPACE MEMBRE DU PROFIL --- */
+.member-area {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.member-area h2 {
+  margin-bottom: 2rem;
+}
+
+.member-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.member-action-card {
+  background-color: var(--background-start);
+  padding: 2rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.member-action-card .auth-button, .member-action-card .secondary-button {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* --- PETIT AJUSTEMENT POUR LES BOUTONS --- */
+/* Assure que les styles de la page de succès sont aussi disponibles ici */
+.step-icon {
+  background-color: var(--accent-color);
+  color: var(--background-start);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+/* Responsive pour l'espace membre */
+@media (max-width: 600px) {
+  .member-actions {
+    grid-template-columns: 1fr;
+  }
+}
