@@ -1,22 +1,27 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const { login } = useAuth();
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const { login } = useAuth()
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
+    e.preventDefault()
+    setError('')
     try {
-      await login(email, password);
+      await login(email, password)
     } catch (err) {
-      setError('Failed to log in. Please check your credentials.');
+      // --- LA MODIFICATION EST ICI (identique à RegisterPage) ---
+      // On lit le message d'erreur précis envoyé par le backend.
+      const message =
+        err.response?.data?.message || 'An unexpected error occurred. Please try again.'
+      setError(message)
+      // -----------------------------------------------------------
     }
-  };
+  }
 
   return (
     <div className="auth-page">
@@ -43,7 +48,9 @@ const LoginPage = () => {
               required
             />
           </div>
-          <button type="submit" className="auth-button">Log In</button>
+          <button type="submit" className="auth-button">
+            Log In
+          </button>
         </form>
         {error && <p className="error-message">{error}</p>}
         <p className="auth-switch">
@@ -51,7 +58,7 @@ const LoginPage = () => {
         </p>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default LoginPage;
+export default LoginPage

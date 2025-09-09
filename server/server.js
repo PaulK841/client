@@ -1,38 +1,30 @@
+require('dotenv').config(); // S'assurer que c'est bien la première ligne
+
 const express = require('express');
-const dotenv = require('dotenv');
 const cors = require('cors');
-
-// Configuration de dotenv TOUT EN HAUT. C'est la correction clé.
-// Il faut le faire avant d'importer les fichiers qui utilisent les variables d'environnement.
-dotenv.config();
-
 const connectDB = require('./config/db.js');
+const { errorHandler } = require('./middleware/errorMiddleware.js'); // <-- IMPORTER
 
-// Import des routes
+// ... (le reste des imports)
 const authRoutes = require('./routes/authRoutes.js');
 const paypalRoutes = require('./routes/paypalRoutes.js');
 
-
-// Connexion à la base de données
 connectDB();
-
 const app = express();
 
-// Middleware pour autoriser les requêtes cross-origin (depuis votre frontend React)
 app.use(cors());
-
-// Middleware pour permettre au serveur d'accepter du JSON dans le corps des requêtes
 app.use(express.json());
 
-// Routes de l'API
-app.get('/', (req, res) => {
-    res.send('API is running...');
-});
+app.get('/', (req, res) => { res.send('API is running...'); });
 
+// Routes de l'API
 app.use('/api/auth', authRoutes);
 app.use('/api/paypal', paypalRoutes);
 
+// --- GESTIONNAIRE D'ERREURS ---
+// Doit être placé APRÈS toutes vos routes d'API
+app.use(errorHandler);
+// -----------------------------
+
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-
