@@ -1,0 +1,11 @@
+/* Importation des directives de base, des composants et des utilitaires de Tailwind CSS. */
+/* C'est ici que Tailwind injectera toutes ses classes de style. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Vous pouvez ajouter ici des styles personnalisés de base si nécessaire. */
+body {
+  /* Assure un défilement fluide pour les ancres (#) */
+  scroll-behavior: smooth;
+}
