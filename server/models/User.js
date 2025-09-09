@@ -18,16 +18,10 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    // --- NOUVEAUX CHAMPS AJOUTÉS ---
-    isSubscribed: {
-      type: Boolean,
-      required: true,
-      default: false, // Par défaut, un nouvel utilisateur n'est pas abonné
+    // ON GARDE UNIQUEMENT CE CHAMP POUR L'ABONNEMENT
+    subscriptionExpiresAt: {
+      type: Date, // Stocke la date exacte d'expiration
     },
-    subscriptionDate: {
-      type: Date, // Pour savoir quand l'abonnement a été pris
-    },
-    // ---------------------------------
   },
   {
     timestamps: true,

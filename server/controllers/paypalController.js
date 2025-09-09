@@ -3,20 +3,30 @@ const User = require('../models/User.js');
 
 const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_API_BASE } = process.env;
 
-const generateAccessToken = async () => { /* ... (code inchangé) ... */ };
+// Fonction complète pour générer le token d'accès
+const generateAccessToken = async () => {
+  try {
+    if (!PAYPAL_CLIENT_ID || !PAYPAL_CLIENT_SECRET) {
+      throw new Error('MISSING_API_CREDENTIALS');
+    }
+    const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64');
+    const response = await axios.post(`${PAYPAL_API_BASE}/v1/oauth2/token`, 'grant_type=client_credentials', {
+      headers: { Authorization: `Basic ${auth}` },
+    });
+    return response.data.access_token;
+  } catch (error) {
+    console.error("Failed to generate Access Token:", error);
+    throw new Error('Failed to generate Access Token');
+  }
+};
 
-/**
- * Crée une commande PayPal avec le prix approprié.
- * Le frontend doit envoyer un 'purchaseType' ('initial' ou 'renewal') dans le corps de la requête.
- */
 const createOrder = async (req, res) => {
   try {
-    const { purchaseType } = req.body; // 'initial' ou 'renewal'
+    const { purchaseType } = req.body;
 
     let price;
     let description;
 
-    // On se base sur le type d'achat demandé par le frontend
     if (purchaseType === 'initial') {
       price = '49.99';
       description = 'AimGuard Starter Pack (Hardware + 1st Month Software)';
@@ -46,9 +56,6 @@ const createOrder = async (req, res) => {
   }
 };
 
-/**
- * Capture le paiement et prolonge l'abonnement de 30 jours.
- */
 const captureOrder = async (req, res) => {
   const { orderID } = req.params;
   try {
@@ -61,9 +68,6 @@ const captureOrder = async (req, res) => {
       const user = await User.findById(req.user._id);
       const now = new Date();
       
-      // On calcule la date de début pour le renouvellement.
-      // Si l'abonnement est toujours actif, on prolonge à partir de la date d'expiration.
-      // Sinon (premier achat ou abonnement expiré), on part de la date d'aujourd'hui.
       const startDate = (user.subscriptionExpiresAt && user.subscriptionExpiresAt > now) 
         ? user.subscriptionExpiresAt 
         : now;

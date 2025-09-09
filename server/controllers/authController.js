@@ -8,6 +8,7 @@ const generateToken = (id) => {
 };
 
 const registerUser = async (req, res) => {
+  // ... (le début de la fonction est correct) ...
   try {
     const { username, email, password } = req.body;
 
@@ -36,7 +37,7 @@ const registerUser = async (req, res) => {
         _id: user._id,
         username: user.username,
         email: user.email,
-        isSubscribed: user.isSubscribed, // <-- AJOUTÉ
+        subscriptionExpiresAt: user.subscriptionExpiresAt, // <-- CORRIGÉ
         token: generateToken(user._id),
       });
     } else {
@@ -49,6 +50,7 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
+  // ... (le début de la fonction est correct) ...
   try {
     const { email, password } = req.body;
 
@@ -63,7 +65,7 @@ const loginUser = async (req, res) => {
         _id: user._id,
         username: user.username,
         email: user.email,
-        isSubscribed: user.isSubscribed, // <-- AJOUTÉ
+        subscriptionExpiresAt: user.subscriptionExpiresAt, // <-- CORRIGÉ
         token: generateToken(user._id),
       });
     } else {
