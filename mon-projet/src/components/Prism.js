@@ -65,50 +65,51 @@ const fragmentShader = `
 
   void main() {
     vec2 uv = vUv;
-    float time = uTime * 0.3;
+    float time = uTime * 0.3;  // Vitesse normale
     
-    // Fond noir par défaut
+    // Fond noir pur
     vec3 color = vec3(0.0, 0.0, 0.0);
     
-    // Créer plusieurs vagues fines
-    float wave1 = uv.y + sin(uv.x * 6.0 + time * 2.0) * 0.05;
-    float wave2 = uv.y + sin(uv.x * 8.0 - time * 1.5) * 0.03 + 0.2;
-    float wave3 = uv.y + sin(uv.x * 4.0 + time * 1.8) * 0.04 + 0.4;
-    float wave4 = uv.y + sin(uv.x * 10.0 - time * 2.2) * 0.02 + 0.6;
-    float wave5 = uv.y + sin(uv.x * 5.0 + time * 1.3) * 0.06 + 0.8;
+    // Système de vagues multiples : plusieurs vagues qui se suivent sans délai
+    float cycleTime = time * 0.25;  // Vitesse normale du cycle
     
-    // Ajouter du bruit subtil pour les rendre organiques
-    float noise = snoise(vec3(uv.x * 3.0, uv.y * 2.0, time * 0.5)) * 0.02;
-    
-    // Couleur des lignes violettes
-    vec3 lineColor = vec3(0.6, 0.3, 1.0);
-    
-    // Épaisseur des lignes très fine
-    float lineWidth = 0.003;
-    
-    // Créer les lignes fines
-    float line1 = 1.0 - smoothstep(0.0, lineWidth, abs(wave1 - uv.y + noise));
-    float line2 = 1.0 - smoothstep(0.0, lineWidth, abs(wave2 - uv.y + noise * 0.5));
-    float line3 = 1.0 - smoothstep(0.0, lineWidth, abs(wave3 - uv.y + noise * 0.7));
-    float line4 = 1.0 - smoothstep(0.0, lineWidth, abs(wave4 - uv.y + noise * 0.3));
-    float line5 = 1.0 - smoothstep(0.0, lineWidth, abs(wave5 - uv.y + noise * 0.8));
-    
-    // Combiner toutes les lignes
-    float allLines = max(max(max(max(line1, line2), line3), line4), line5);
-    
-    // Ajouter un léger effet de lueur aux lignes
-    float glow = 0.0;
-    glow += (1.0 - smoothstep(0.0, lineWidth * 3.0, abs(wave1 - uv.y + noise))) * 0.3;
-    glow += (1.0 - smoothstep(0.0, lineWidth * 3.0, abs(wave2 - uv.y + noise * 0.5))) * 0.2;
-    glow += (1.0 - smoothstep(0.0, lineWidth * 3.0, abs(wave3 - uv.y + noise * 0.7))) * 0.25;
-    glow += (1.0 - smoothstep(0.0, lineWidth * 3.0, abs(wave4 - uv.y + noise * 0.3))) * 0.15;
-    glow += (1.0 - smoothstep(0.0, lineWidth * 3.0, abs(wave5 - uv.y + noise * 0.8))) * 0.3;
-    
-    // Mélanger les lignes avec le fond noir
-    color = mix(color, lineColor, allLines);
-    
-    // Ajouter la lueur subtile
-    color += lineColor * glow * 0.1;
+    // Créer plusieurs vagues qui se suivent
+    for(int i = 0; i < 3; i++) {
+      float offset = float(i) * 0.33;  // Espacement entre les vagues
+      float wavePosition = 1.0 - mod(cycleTime + offset, 1.0);
+      
+      // Créer la vague avec des ondulations verticales
+      float wave = wavePosition + sin(uv.y * 12.0 + time * 0.8) * 0.02;
+      wave += sin(uv.y * 24.0 + time * 1.1) * 0.01;
+      wave += sin(uv.y * 48.0 + time * 1.4) * 0.005;
+      
+      // Ajouter du bruit très subtil pour plus de réalisme
+      float noise = snoise(vec3(uv.x * 6.0, uv.y * 8.0, time * 0.8)) * 0.01;
+      wave += noise;
+      
+      // Couleur violette principale
+      vec3 lineColor = vec3(0.6, 0.3, 1.0);
+      
+      // Épaisseur très fine avec anti-aliasing
+      float lineWidth = 0.0015;
+      float smoothness = 0.0008;
+      
+      // Créer la ligne principale
+      float line = 1.0 - smoothstep(lineWidth - smoothness, lineWidth + smoothness, abs(uv.x - wave));
+      
+      // Ajouter la ligne principale
+      color += lineColor * line;
+      
+      // Effet de lueur autour de la vague
+      float glowWidth = 0.006;
+      float glow = (1.0 - smoothstep(0.0, glowWidth, abs(uv.x - wave))) * 0.2;
+      color += lineColor * glow * 0.5;
+      
+      // Halo pour plus de profondeur
+      float haloWidth = 0.015;
+      float halo = (1.0 - smoothstep(0.0, haloWidth, abs(uv.x - wave))) * 0.05;
+      color += lineColor * halo * 0.3;
+    }
     
     gl_FragColor = vec4(color, 1.0);
   }

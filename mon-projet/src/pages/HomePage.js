@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import useIntersectionObserver from '../hooks/useIntersectionObserver';
 import physicalToolImg from '../assets/unnamed (1).png'; 
 import softwareImg from '../assets/software.png';
@@ -19,21 +19,31 @@ const HomePage = () => {
   const [hardwareRef, isHardwareVisible] = useIntersectionObserver({ threshold: 0.1 });
   const [softwareRef, isSoftwareVisible] = useIntersectionObserver({ threshold: 0.1 });
 
-  const handleMouseMove = (e) => {
-    const el = tiltRef.current;
-    if (!el) return;
-    const { clientX, clientY } = e;
-    const rect = tiltContainerRef.current.getBoundingClientRect();
-    const x = (clientX - rect.left - rect.width / 2) / (rect.width / 2);
-    const y = (clientY - rect.top - rect.height / 2) / (rect.height / 2);
-    el.style.transform = `perspective(1000px) rotateX(${-y * 10}deg) rotateY(${x * 10}deg) scale3d(1.05, 1.05, 1.05)`;
-  };
-
-  const handleMouseLeave = () => {
-    const el = tiltRef.current;
-    if (!el) return;
-    el.style.transform = `perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
-  };
+  // Animation automatique de rotation pour l'outil physique
+  useEffect(() => {
+    let animationId;
+    
+    const animate = (time) => {
+      const el = tiltRef.current;
+      if (el) {
+        // Rotation douce et continue
+        const rotationY = Math.sin(time * 0.0008) * 15; // Rotation Y de -15 à +15 degrés
+        const rotationX = Math.sin(time * 0.0006) * 8;  // Rotation X de -8 à +8 degrés
+        const scale = 1 + Math.sin(time * 0.001) * 0.05; // Légère pulsation
+        
+        el.style.transform = `perspective(1000px) rotateX(${rotationX}deg) rotateY(${rotationY}deg) scale3d(${scale}, ${scale}, ${scale})`;
+      }
+      animationId = requestAnimationFrame(animate);
+    };
+    
+    animationId = requestAnimationFrame(animate);
+    
+    return () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+    };
+  }, []);
 
   return (
     <>
@@ -67,7 +77,7 @@ const HomePage = () => {
         className={`split-section fade-in-section ${isHardwareVisible ? 'is-visible' : ''}`} 
         ref={hardwareRef}
       >
-        <div className="container split-section-grid" onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
+        <div className="container split-section-grid">
           <div className="text-content">
             <h2>Expertly Hand-Crafted Hardware</h2>
             <p>You don't just receive a product; you receive a piece of precision engineering. Each AimGuard device is meticulously assembled by hand to ensure maximum quality and performance.</p>
