@@ -10,7 +10,7 @@ const PayPalButton = ({ purchaseType }) => {
 
     const createOrder = async () => {
         try {
-            const response = await api.post('/paypal/orders', { purchaseType });
+            const response = await api.post('/api/paypal/orders', { purchaseType });
             return response.data.id;
         } catch (error) {
             const message = error.response?.data?.message || 'Could not connect to the server.';
@@ -21,7 +21,7 @@ const PayPalButton = ({ purchaseType }) => {
 
     const onApprove = async (data) => {
         try {
-            await api.post(`/paypal/orders/${data.orderID}/capture`);
+            await api.post(`/api/paypal/orders/${data.orderID}/capture`);
             await refreshUserProfile(); // <-- REFRESH THE FULL PROFILE
             navigate('/success');
         } catch (error) {

@@ -5,7 +5,7 @@ import axios from 'axios';
  * Elle utilise la variable d'environnement REACT_APP_API_URL si elle est définie (en production sur Vercel),
  * sinon, elle utilise l'adresse du serveur local pour le développement.
  */
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
 // On crée une instance d'Axios avec l'URL de base dynamique.
 const api = axios.create({
