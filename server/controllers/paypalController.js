@@ -91,6 +91,13 @@ const createOrder = async (req, res, next) => {
     
     console.log(`💰 Création de commande: ${description} - ${price}€`);
     
+    // Vérifier l'URL du client
+    const clientUrl = process.env.CLIENT_URL || 'https://client-seven-green.vercel.app';
+    console.log(`🌐 URL du client configurée: ${clientUrl}`);
+    if (!process.env.CLIENT_URL) {
+      console.warn('⚠️  CLIENT_URL non définie, utilisation de l\'URL par défaut');
+    }
+    
     // Générer le token d'accès PayPal
     const accessToken = await generateAccessToken();
     
@@ -111,8 +118,8 @@ const createOrder = async (req, res, next) => {
         brand_name: 'AimGuard',
         landing_page: 'NO_PREFERENCE',
         user_action: 'PAY_NOW',
-        return_url: `${process.env.CLIENT_URL}/payment-success`,
-        cancel_url: `${process.env.CLIENT_URL}/payment-cancel`
+        return_url: `${clientUrl}/payment-success`,
+        cancel_url: `${clientUrl}/payment-cancel`
       }
     };
     
