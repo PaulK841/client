@@ -17,7 +17,7 @@ const DiscordIcon = () => (
 );
 
 const ProfilePage = () => {
-  const { user, refreshUserProfile, token } = useAuth();
+  const { user, refreshUserProfile } = useAuth();
   const [loading, setLoading] = useState(!user);
 
   useEffect(() => {

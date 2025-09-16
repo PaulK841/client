@@ -34,7 +34,7 @@ function useIntersectionObserver(options = {}) {
 
     // Fonction de nettoyage : quand le composant est retiré, on arrête d'observer
     return () => observer.disconnect();
-  }, [options.root, options.rootMargin, options.threshold]); // On recrée l'observateur si les options changent
+  }, [options]); // On recrée l'observateur si les options changent
 
   // On retourne la ref pour l'attacher à un élément, et si cet élément est en train d'intersecter
   return [elementRef, entry?.isIntersecting];

@@ -3,55 +3,10 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
+  width: 100vw;
+  height: 100vh;
+  z-index: -100;
   overflow: hidden;
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-}
-
-/* Overlay pour assombrir légèrement l'effet */
-.prism-background-wrapper::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(15, 23, 42, 0.2);
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Fallback pour WebGL non supporté */
-.prism-fallback {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.fallback-gradient {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(ellipse at 20% 80%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
-    radial-gradient(ellipse at 40% 40%, rgba(6, 182, 212, 0.2) 0%, transparent 50%);
-  animation: subtleMove 20s ease-in-out infinite;
-}
-
-@keyframes subtleMove {
-  0%, 100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 0.7;
-  }
-  50% {
-    transform: scale(1.1) rotate(180deg);
-    opacity: 0.9;
-  }
+  background: #000;
+  pointer-events: none; /* Permet de cliquer à travers */
 }
