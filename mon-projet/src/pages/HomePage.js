@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import useIntersectionObserver from '../hooks/useIntersectionObserver';
+import AnimatedText from '../components/AnimatedText';
 import physicalToolImg from '../assets/unnamed (1).png'; 
 import softwareImg from '../assets/software.png';
 
@@ -39,9 +40,27 @@ const HomePage = () => {
     <>
       <section className="hero">
         <div className="hero-content">
-          <h1>Master Your Aim. Conquer the Game.</h1>
-          <p>The ultimate hardware-based anti-recoil solution for competitive gamers who demand pixel-perfect precision.</p>
-          <a href="#features" className="hero-btn">Explore Features</a>
+          <h1>
+            <AnimatedText 
+              text="Master Your Aim. Conquer the Game." 
+              delay={80}
+              animationType="neon"
+            />
+          </h1>
+          <p>
+            <AnimatedText 
+              text="The ultimate hardware-based anti-recoil solution for competitive gamers who demand pixel-perfect precision."
+              delay={30}
+              animationType="fadeInUp"
+            />
+          </p>
+          <a href="#features" className="hero-btn">
+            <AnimatedText 
+              text="Explore Features"
+              delay={50}
+              animationType="glitch"
+            />
+          </a>
         </div>
       </section>
 
@@ -51,7 +70,15 @@ const HomePage = () => {
         ref={featuresRef}
       >
         <div className="container">
-          <div className="section-header"><h2>Why Choose AimGuard?</h2></div>
+          <div className="section-header">
+            <h2>
+              <AnimatedText 
+                text="Why Choose AimGuard?" 
+                delay={60}
+                animationType="hologram"
+              />
+            </h2>
+          </div>
           <div className="features-grid">
             <div className="feature-card"><h3><CrosshairIcon/> Pixel-Perfect Precision</h3><p>Our advanced algorithm provides flawless recoil compensation, turning your spray into a laser beam.</p></div>
             <div className="feature-card"><h3><SettingsIcon/> Fully Customizable</h3><p>Fine-tune every aspect of recoil control for any weapon in any game with our intuitive software.</p></div>

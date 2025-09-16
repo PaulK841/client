@@ -4,6 +4,12 @@ import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
+import PrismBackground from './components/PrismBackground';
+import FloatingElements from './components/FloatingElements';
+
+import './styles/PrismBackground.css';
+import './styles/FloatingElements.css';
+import './styles/AnimatedText.css';
 
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
@@ -17,6 +23,8 @@ import PaymentCancelPage from './pages/PaymentCancelPage';
 function App() {
   return (
     <div className="app-wrapper">
+      <PrismBackground />
+      <FloatingElements />
       <Header />
       <main>
         <Routes>
