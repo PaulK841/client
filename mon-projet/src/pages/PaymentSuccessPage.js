@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import MemberActions from './MemberActions'; // Assurez-vous que le chemin est correct
+import MemberActions from '../components/MemberActions';
 
 const PaymentSuccessPage = () => {
   return (
