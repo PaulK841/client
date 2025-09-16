@@ -61,8 +61,8 @@ const ProfilePage = () => {
     );
   }
 
-  // Valeurs venant d’un .env (Vite) – tu peux aussi tout passer par l’API si tu préfères
-  const DISCORD_INVITE = import.meta.env.VITE_DISCORD_INVITE_URL || '#';
+  // Valeurs venant d'un .env (Create React App) – tu peux aussi tout passer par l'API si tu préfères
+  const DISCORD_INVITE = process.env.REACT_APP_DISCORD_INVITE_URL || 'https://discord.gg/your-invite-code';
   const DOWNLOAD_API = '/api/download/latest'; // route sécurisée (voir backend ci-dessous)
 
   return (
