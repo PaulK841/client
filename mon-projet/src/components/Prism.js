@@ -22,8 +22,13 @@ const Prism = ({
   const containerRef = useRef(null);
 
   useEffect(() => {
+    console.log('Prism useEffect started');
     const container = containerRef.current;
-    if (!container) return;
+    if (!container) {
+      console.error('Container ref is null');
+      return;
+    }
+    console.log('Container found:', container);
 
     const H = Math.max(0.001, height);
     const BW = Math.max(0.001, baseWidth);
@@ -45,12 +50,21 @@ const Prism = ({
     const INERT = Math.max(0, Math.min(1, inertia || 0.12));
 
     const dpr = Math.min(2, window.devicePixelRatio || 1);
-    const renderer = new Renderer({
-      dpr,
-      alpha: transparent,
-      antialias: false
-    });
-    const gl = renderer.gl;
+    console.log('Creating OGL Renderer...');
+    
+    let renderer, gl;
+    try {
+      renderer = new Renderer({
+        dpr,
+        alpha: transparent,
+        antialias: false
+      });
+      gl = renderer.gl;
+      console.log('OGL Renderer created successfully');
+    } catch (error) {
+      console.error('Failed to create OGL Renderer:', error);
+      throw error;
+    }
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
     gl.disable(gl.BLEND);
