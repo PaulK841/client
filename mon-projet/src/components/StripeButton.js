@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
 import axios from 'axios';
 import API_BASE_URL from '../config/api';
 
