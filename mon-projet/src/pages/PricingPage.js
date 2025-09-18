@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PayPalButton from '../components/PayPalButton';
+import StripeButton from '../components/StripeButton';
 
 const PricingPage = () => {
   const { token } = useAuth();
@@ -32,8 +33,25 @@ const PricingPage = () => {
         {token ? (
           <div className="payment-section">
             <h3>Complete Your Purchase</h3>
-            {/* On spécifie que c'est un achat initial */}
-            <PayPalButton purchaseType="initial" />
+            <div className="payment-options">
+              {/* PayPal Option */}
+              <div className="payment-option">
+                <h4>PayPal</h4>
+                <PayPalButton purchaseType="initial" />
+              </div>
+              
+              {/* Stripe Option */}
+              <div className="payment-option">
+                <h4>Card Payment</h4>
+                <StripeButton 
+                  priceId="price_1234567890" // Vous devrez remplacer par votre vrai price ID
+                  productName="AimGuard Starter Pack"
+                  amount={49.99}
+                  onSuccess={() => console.log('Paiement Stripe réussi')}
+                  onError={(error) => console.error('Erreur Stripe:', error)}
+                />
+              </div>
+            </div>
           </div>
         ) : (
           <div className="login-prompt">
@@ -46,6 +64,40 @@ const PricingPage = () => {
           </div>
         )}
       </div>
+
+      <style jsx>{`
+        .payment-options {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+          margin-top: 20px;
+        }
+
+        .payment-option {
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          padding: 20px;
+          background: #f9fafb;
+        }
+
+        .payment-option h4 {
+          margin: 0 0 15px 0;
+          color: #374151;
+          font-size: 1.1rem;
+          font-weight: 600;
+        }
+
+        @media (min-width: 768px) {
+          .payment-options {
+            flex-direction: row;
+            gap: 30px;
+          }
+          
+          .payment-option {
+            flex: 1;
+          }
+        }
+      `}</style>
     </div>
   );
 };

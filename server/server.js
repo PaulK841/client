@@ -1,4 +1,4 @@
-// Doit être la TOUTE PREMIÈRE ligne pour que les variables soient disponibles partout
+// Configuration des variables d'environnement (Render gère automatiquement les variables)
 require('dotenv').config();
 
 const express = require('express');
@@ -10,6 +10,7 @@ const { notFound, errorHandler } = require('./middleware/errorMiddleware.js');
 const authRoutes = require('./routes/authRoutes.js');
 const paypalRoutes = require('./routes/paypalRoutes.js');
 const userRoutes = require('./routes/userRoutes.js');
+const stripeRoutes = require('./routes/stripeRoutes.js');
 
 // Démarrer la connexion à la base de données
 connectDB();
@@ -31,6 +32,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/paypal', paypalRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/stripe', stripeRoutes);
 
 // Middlewares de gestion d'erreurs (doivent être à la fin)
 app.use(notFound);
