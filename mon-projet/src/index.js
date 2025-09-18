@@ -10,7 +10,8 @@ import './App.css';
 const initialOptions = {
   "client-id": "ATKfMgsTLxFRdok7EPEgzmUUGZPl5cKLf6df4BHkiG58ndpWUe1duPvSzrC9tj274yrcslazDVw-wpn8",
   currency: "EUR",
-  intent: "capture",
+  intent: "subscription",
+  vault: true,
 };
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

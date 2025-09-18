@@ -44,8 +44,8 @@ const PricingPage = () => {
               <div className="payment-option">
                 <h4>Pay with Card</h4>
                 <StripeButton 
-                  setupFeePriceId="YOUR_SETUP_FEE_PRICE_ID_HERE" // <-- REMPLACEZ CECI
-                  subscriptionPriceId="YOUR_SUBSCRIPTION_PRICE_ID_HERE" // <-- ET CECI
+                  setupFeePriceId="prod_T50pzZViRw9EJA" // <-- REMPLACEZ CECI
+                  subscriptionPriceId="prod_T50tLBPjT3Y0ov" // <-- ET CECI
                   productName="AimGuard Starter Pack"
                   amount={49.99}
                   onSuccess={() => console.log('Stripe Payment successful')}
