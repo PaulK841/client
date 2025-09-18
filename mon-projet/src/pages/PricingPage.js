@@ -44,8 +44,8 @@ const PricingPage = () => {
               <div className="payment-option">
                 <h4>Pay with Card</h4>
                 <StripeButton 
-                  setupFeePriceId="prod_T50pzZViRw9EJA" // <-- REMPLACEZ CECI
-                  subscriptionPriceId="prod_T50tLBPjT3Y0ov" // <-- ET CECI
+                  setupFeePriceId="price_1S8qnc7wIAbicqb4kPdYqCSJ" // Frais de matériel
+                  subscriptionPriceId="price_1S8qrq7wIAbicqb4IIvkphzP" // Abonnement logiciel
                   productName="AimGuard Starter Pack"
                   amount={49.99}
                   onSuccess={() => console.log('Stripe Payment successful')}
