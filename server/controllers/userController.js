@@ -1,7 +1,7 @@
 // controllers/userController.js
 const User = require('../models/User');
 
-const getUserProfile = async (req, res, next) => {
+exports.getUserProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id).select('-password');
     if (user) {
@@ -19,8 +19,4 @@ const getUserProfile = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
-
-module.exports = {
-  getUserProfile,
 };

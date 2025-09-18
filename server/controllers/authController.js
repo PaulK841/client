@@ -17,7 +17,7 @@ const generateToken = (id) => {
  * @route   POST /api/auth/register
  * @access  Public
  */
-const registerUser = async (req, res, next) => {
+exports.registerUser = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
 
@@ -71,7 +71,7 @@ const registerUser = async (req, res, next) => {
  * @route   POST /api/auth/login
  * @access  Public
  */
-const loginUser = async (req, res, next) => {
+exports.loginUser = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -103,9 +103,4 @@ const loginUser = async (req, res, next) => {
     // On passe toute erreur à notre gestionnaire d'erreurs central
     next(error);
   }
-};
-
-module.exports = {
-  registerUser,
-  loginUser,
 };

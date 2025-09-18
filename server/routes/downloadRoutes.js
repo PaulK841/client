@@ -1,7 +1,7 @@
 // server/routes/downloadRoutes.js
 const express = require('express');
 const path = require('path');
-const { protect } = require('../middleware/authMiddleware');
+const protect = require('../middleware/authMiddleware');
 const router = express.Router();
 
 router.get('/latest', protect, async (req, res, next) => {
