@@ -15,7 +15,7 @@ const PaymentSuccessPage = () => {
     useEffect(() => {
         const verifyPayment = async () => {
             if (!sessionId) {
-                setError('Session ID manquant');
+                setError('Missing Session ID');
                 setPaymentStatus('error');
                 return;
             }
@@ -26,16 +26,13 @@ const PaymentSuccessPage = () => {
                 if (response.data.success) {
                     setPaymentStatus('success');
                     setPaymentDetails(response.data);
-                    
-                    // Mettre à jour le statut de l'utilisateur dans la base de données
-                    // Vous pouvez ajouter une logique ici pour activer l'accès premium
-                    
+                    // User status update will be handled by the webhook
                 } else {
                     setPaymentStatus('failed');
                 }
             } catch (error) {
-                console.error('Erreur vérification paiement:', error);
-                setError('Erreur lors de la vérification du paiement');
+                console.error('Payment verification error:', error);
+                setError('An error occurred while verifying your payment.');
                 setPaymentStatus('error');
             }
         };
@@ -52,8 +49,8 @@ const PaymentSuccessPage = () => {
             <div className="payment-success-page">
                 <div className="loading-container">
                     <div className="spinner"></div>
-                    <h2>Vérification du paiement...</h2>
-                    <p>Veuillez patienter pendant que nous vérifions votre paiement.</p>
+                    <h2>Verifying Payment...</h2>
+                    <p>Please wait while we confirm your payment.</p>
                 </div>
             </div>
         );
@@ -64,10 +61,10 @@ const PaymentSuccessPage = () => {
             <div className="payment-success-page">
                 <div className="error-container">
                     <div className="error-icon">❌</div>
-                    <h2>Erreur de paiement</h2>
-                    <p>{error || 'Une erreur est survenue lors de la vérification de votre paiement.'}</p>
+                    <h2>Payment Error</h2>
+                    <p>{error || 'An error occurred while verifying your payment.'}</p>
                     <button onClick={() => navigate('/pricing')} className="retry-button">
-                        Réessayer
+                        Try Again
                     </button>
                 </div>
             </div>
@@ -79,10 +76,10 @@ const PaymentSuccessPage = () => {
             <div className="payment-success-page">
                 <div className="failed-container">
                     <div className="failed-icon">⚠️</div>
-                    <h2>Paiement non confirmé</h2>
-                    <p>Votre paiement n'a pas pu être confirmé. Veuillez réessayer.</p>
+                    <h2>Payment Not Confirmed</h2>
+                    <p>We could not confirm your payment. Please try again.</p>
                     <button onClick={() => navigate('/pricing')} className="retry-button">
-                        Réessayer
+                        Try Again
                     </button>
                 </div>
             </div>
@@ -93,29 +90,29 @@ const PaymentSuccessPage = () => {
         <div className="payment-success-page">
             <div className="success-container">
                 <div className="success-icon">✅</div>
-                <h1>Paiement réussi !</h1>
-                <p>Merci pour votre achat. Votre compte a été mis à jour.</p>
+                <h1>Payment Successful!</h1>
+                <p>Thank you for your purchase. Your account has been updated.</p>
                 
                 {paymentDetails && (
                     <div className="payment-details">
-                        <h3>Détails du paiement</h3>
+                        <h3>Payment Details</h3>
                         <div className="detail-item">
                             <span>Email:</span>
                             <span>{paymentDetails.customerEmail}</span>
                         </div>
                         <div className="detail-item">
-                            <span>Montant:</span>
+                            <span>Amount:</span>
                             <span>{(paymentDetails.amount / 100).toFixed(2)}€</span>
                         </div>
                         <div className="detail-item">
-                            <span>Devise:</span>
+                            <span>Currency:</span>
                             <span>{paymentDetails.currency.toUpperCase()}</span>
                         </div>
                     </div>
                 )}
 
                 <button onClick={handleContinue} className="continue-button">
-                    Continuer vers le Dashboard
+                    Continue to Dashboard
                 </button>
             </div>
 

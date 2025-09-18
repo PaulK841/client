@@ -1,49 +1,62 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PayPalButtons } from "@paypal/react-paypal-js";
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
-const PayPalButton = ({ purchaseType }) => {
+const PayPalButton = () => {
     const navigate = useNavigate();
-    const { refreshUserProfile } = useAuth(); // <-- Get the new function
+    const { refreshUserProfile } = useAuth();
+    const [error, setError] = useState(null);
 
-    const createOrder = async () => {
+    const createSubscription = async (data, actions) => {
         try {
-            const response = await api.post('/api/paypal/orders', { purchaseType });
-            return response.data.id;
-        } catch (error) {
-            const message = error.response?.data?.message || 'Could not connect to the server.';
-            alert(`Payment Error: ${message}`);
+            setError(null);
+            console.log("Creating PayPal subscription...");
+            const response = await api.post('/api/paypal/orders'); // Pointe vers la nouvelle logique createSubscription
+            console.log("Subscription created:", response.data.subscriptionId);
+            return response.data.subscriptionId;
+        } catch (err) {
+            console.error("API Error (createSubscription):", err.response?.data?.message || err.message);
+            setError("Could not initiate the subscription process. Please try again.");
             return null;
         }
     };
 
-    const onApprove = async (data) => {
+    const onApprove = async (data, actions) => {
         try {
-            await api.post(`/api/paypal/orders/${data.orderID}/capture`);
-            await refreshUserProfile(); // <-- REFRESH THE FULL PROFILE
-            navigate('/success');
-        } catch (error) {
-            const message = error.response?.data?.message || 'Failed to confirm the payment.';
-            alert(`Capture Error: ${message}`);
-            navigate('/cancel');
+            console.log("Subscription approved by user:", data.subscriptionID);
+            // The webhook will handle the database update.
+            await refreshUserProfile();
+            navigate('/payment-success'); // Rediriger vers une page de succès générique
+        } catch (err) {
+            console.error("Error (onApprove):", err);
+            setError("An error occurred while finalizing your subscription.");
+            navigate('/payment-cancel');
         }
     };
-    
-    const onCancel = () => {
-        console.log("Payment cancelled by user.");
-        navigate('/cancel');
+
+    const onError = (err) => {
+        console.error("PayPal Button Error:", err);
+        setError("An error occurred with PayPal. Payment was not processed.");
     };
 
     return (
-        <div style={{ maxWidth: '750px', minHeight: '200px', margin: '2rem auto' }}>
+        <div className="paypal-payment">
             <PayPalButtons
-                style={{ layout: "vertical" }}
-                createOrder={createOrder}
+                style={{ layout: "vertical", color: "blue", shape: "rect", label: "subscribe" }}
+                createSubscription={createSubscription}
                 onApprove={onApprove}
-                onCancel={onCancel}
+                onError={onError}
             />
+            {error && <div className="error-message">{error}</div>}
+            <style jsx>{`
+              .error-message {
+                color: #ef4444;
+                margin-top: 10px;
+                text-align: center;
+              }
+            `}</style>
         </div>
     );
 };

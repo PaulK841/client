@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import API_BASE_URL from '../config/api';
 
-const StripeButton = ({ priceId, productName, amount, onSuccess, onError }) => {
+const StripeButton = ({ setupFeePriceId, subscriptionPriceId, productName, amount, onSuccess, onError }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -11,17 +11,14 @@ const StripeButton = ({ priceId, productName, amount, onSuccess, onError }) => {
             setLoading(true);
             setError(null);
 
-            // Récupérer le token d'authentification
             const token = localStorage.getItem('token');
             if (!token) {
-                throw new Error('Vous devez être connecté pour effectuer un paiement');
+                throw new Error('You must be logged in to make a payment.');
             }
 
-            // Créer la session de paiement
             const response = await axios.post(`${API_BASE_URL}/api/stripe/create-session`, {
-                priceId: priceId,
-                productName: productName,
-                userId: JSON.parse(localStorage.getItem('user'))?.id
+                setupFeePriceId: setupFeePriceId,
+                subscriptionPriceId: subscriptionPriceId,
             }, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -30,13 +27,11 @@ const StripeButton = ({ priceId, productName, amount, onSuccess, onError }) => {
             });
 
             const { url } = response.data;
-
-            // Rediriger vers Stripe Checkout
             window.location.href = url;
 
         } catch (error) {
-            console.error('Erreur paiement:', error);
-            setError(error.response?.data?.error || 'Erreur lors du paiement');
+            console.error('Payment Error:', error);
+            setError(error.response?.data?.error || 'An error occurred during payment.');
             if (onError) onError(error);
         } finally {
             setLoading(false);
@@ -47,22 +42,28 @@ const StripeButton = ({ priceId, productName, amount, onSuccess, onError }) => {
         <div className="stripe-payment">
             <button 
                 onClick={handlePayment}
-                disabled={loading}
+                disabled={loading || !setupFeePriceId.startsWith('price_') || !subscriptionPriceId.startsWith('price_')}
                 className={`stripe-button ${loading ? 'loading' : ''}`}
             >
                 {loading ? (
                     <>
                         <span className="spinner"></span>
-                        Traitement...
+                        Processing...
                     </>
                 ) : (
                     <>
                         <span className="stripe-logo">💳</span>
-                        Payer avec Stripe ({amount}€)
+                        Pay with Stripe ({amount}€)
                     </>
                 )}
             </button>
             
+            {(!setupFeePriceId.startsWith('price_') || !subscriptionPriceId.startsWith('price_')) && (
+                 <div className="error-message">
+                    Stripe is not configured. Please replace the placeholder IDs.
+                </div>
+            )}
+
             {error && (
                 <div className="error-message">
                     {error}

@@ -19,6 +19,12 @@ const app = express();
 
 // Middlewares de base
 app.use(cors());
+
+// IMPORTANT : Le webhook de Stripe a besoin du 'raw body', donc ce middleware
+// doit être placé AVANT express.json().
+// On utilise une expression régulière pour matcher /api/stripe/webhook ou /api/paypal/webhook
+app.use(/\/api\/(stripe|paypal)\/webhook/, express.raw({ type: 'application/json' }));
+
 app.use(express.json());
 
 // --- ROUTE DE HEALTH CHECK AJOUTÉE ---

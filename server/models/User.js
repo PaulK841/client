@@ -24,9 +24,24 @@ const userSchema = mongoose.Schema(
     },
     subscriptionStatus: {
       type: String,
-      enum: ['inactive', 'confirmed', 'expired'],
-      default: 'inactive'
+      enum: ['active', 'inactive', 'cancelled'],
+      default: 'inactive',
     },
+    stripeCustomerId: {
+      type: String,
+      unique: true,
+      sparse: true // Allows multiple documents to have no value for this field
+    },
+    stripeSubscriptionId: {
+      type: String,
+      unique: true,
+      sparse: true
+    },
+    paypalSubscriptionId: {
+      type: String,
+      unique: true,
+      sparse: true
+    }
   },
   {
     timestamps: true,

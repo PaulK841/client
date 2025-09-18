@@ -36,19 +36,20 @@ const PricingPage = () => {
             <div className="payment-options">
               {/* PayPal Option */}
               <div className="payment-option">
-                <h4>PayPal</h4>
-                <PayPalButton purchaseType="initial" />
+                <h4>Pay with PayPal</h4>
+                <PayPalButton />
               </div>
               
               {/* Stripe Option */}
               <div className="payment-option">
-                <h4>Card Payment</h4>
+                <h4>Pay with Card</h4>
                 <StripeButton 
-                  priceId="price_1234567890" // Vous devrez remplacer par votre vrai price ID
+                  setupFeePriceId="YOUR_SETUP_FEE_PRICE_ID_HERE" // <-- REMPLACEZ CECI
+                  subscriptionPriceId="YOUR_SUBSCRIPTION_PRICE_ID_HERE" // <-- ET CECI
                   productName="AimGuard Starter Pack"
                   amount={49.99}
-                  onSuccess={() => console.log('Paiement Stripe réussi')}
-                  onError={(error) => console.error('Erreur Stripe:', error)}
+                  onSuccess={() => console.log('Stripe Payment successful')}
+                  onError={(error) => console.error('Stripe Error:', error)}
                 />
               </div>
             </div>
