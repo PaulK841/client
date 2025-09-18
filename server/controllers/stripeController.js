@@ -28,6 +28,17 @@ const createSubscriptionSession = async (req, res) => {
     console.log('📥 IDs de prix reçus du frontend:');
     console.log('   - ID Abonnement:', subscriptionPriceId);
     console.log('   - ID Frais matériel:', setupFeePriceId);
+
+    // 3. Vérifier l'URL client pour la redirection
+    const clientUrl = process.env.CLIENT_URL;
+    if (!clientUrl) {
+        console.error('❌ ERREUR FATALE : La variable CLIENT_URL est manquante !');
+    } else if (!clientUrl.startsWith('http')) {
+        console.error(`🚨 ALERTE : La variable CLIENT_URL ("${clientUrl}") ne commence pas par http:// ou https://`);
+    } else {
+        console.log('✅ URL de redirection client chargée:', clientUrl);
+    }
+
     console.log('========================================\n');
     // --- FIN DU CODE DE DÉBOGAGE ---
 
