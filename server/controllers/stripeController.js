@@ -5,8 +5,33 @@ const User = require('../models/User'); // Assurez-vous d'importer le modèle Us
  * Crée une session de paiement Stripe pour un ABONNEMENT avec frais d'installation.
  */
 const createSubscriptionSession = async (req, res) => {
+    // --- CODE DE DÉBOGAGE AJOUTÉ ---
+    console.log('\n========================================');
+    console.log('🏁 Tentative de création de session Stripe...');
+    console.log('========================================');
+    
+    // 1. Vérifier si la clé secrète Stripe est chargée
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeKey) {
+        console.error('❌ ERREUR FATALE : La variable STRIPE_SECRET_KEY est manquante ou vide !');
+    } else {
+        console.log('✅ Clé secrète Stripe chargée.');
+        // Affiche une version "masquée" de la clé pour vérification (ex: sk_test_...1234)
+        console.log(`   Clé utilisée: ${stripeKey.substring(0, 11)}...${stripeKey.slice(-4)}`);
+        if (stripeKey.startsWith('whsec_')) {
+            console.error('🚨 ALERTE : Vous utilisez la clé de webhook (whsec_) au lieu de la clé secrète (sk_) !');
+        }
+    }
+
+    // 2. Vérifier les IDs de prix reçus du frontend
+    const { subscriptionPriceId, setupFeePriceId } = req.body;
+    console.log('📥 IDs de prix reçus du frontend:');
+    console.log('   - ID Abonnement:', subscriptionPriceId);
+    console.log('   - ID Frais matériel:', setupFeePriceId);
+    console.log('========================================\n');
+    // --- FIN DU CODE DE DÉBOGAGE ---
+
     try {
-        const { subscriptionPriceId, setupFeePriceId } = req.body;
         const userId = req.user.id; // Depuis le middleware d'authentification
 
         if (!subscriptionPriceId || !setupFeePriceId) {
@@ -60,7 +85,7 @@ const createSubscriptionSession = async (req, res) => {
 
         res.json({ sessionId: session.id, url: session.url });
     } catch (error) {
-        console.error('Stripe Subscription Creation Error:', error.message);
+        console.error('❌ Erreur Stripe (Création Abonnement):', error.message);
         res.status(500).json({ error: 'Error creating the payment session.' });
     }
 };
