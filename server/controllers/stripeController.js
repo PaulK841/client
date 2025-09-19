@@ -96,8 +96,8 @@ const createSubscriptionSession = async (req, res) => {
             });
         }
 
-        // Créer la session Stripe en mode abonnement
-        const session = await stripe.checkout.sessions.create({
+        // Configuration de base pour la session Stripe
+        const sessionConfig = {
             mode: 'subscription',
             customer: customerId,
             payment_method_types: ['card'],
@@ -106,8 +106,25 @@ const createSubscriptionSession = async (req, res) => {
             cancel_url: `${process.env.CLIENT_URL}/payment-cancel`,
             metadata: {
                 userId: userId,
+                isRenewal: isRenewal ? 'true' : 'false'
             },
-        });
+        };
+
+        // Pour les nouveaux clients (pas de renouvellement), collecter l'adresse de livraison
+        if (!isRenewal) {
+            sessionConfig.shipping_address_collection = {
+                allowed_countries: ['FR', 'BE', 'DE', 'ES', 'IT', 'NL', 'PT', 'LU', 'AT', 'CH']
+            };
+            sessionConfig.phone_number_collection = {
+                enabled: true
+            };
+            console.log('📦 Collection d\'adresse activée pour nouveau client');
+        } else {
+            console.log('🔄 Pas de collection d\'adresse pour renouvellement');
+        }
+
+        // Créer la session Stripe
+        const session = await stripe.checkout.sessions.create(sessionConfig);
 
         res.json({ sessionId: session.id, url: session.url });
     } catch (error) {
@@ -154,18 +171,47 @@ const handleWebhook = async (req, res) => {
             const session = event.data.object;
             console.log('-> checkout.session.completed pour le client:', session.customer);
 
-            // Étape 1: Activer l'abonnement sans date de fin.
+            // Données de base à mettre à jour
+            const updateData = {
+                stripeSubscriptionId: session.subscription,
+                subscriptionStatus: 'active'
+            };
+
+            // Si c'est un nouveau client (pas un renouvellement), extraire l'adresse
+            const isRenewal = session.metadata?.isRenewal === 'true';
+            if (!isRenewal && session.shipping_details) {
+                updateData.shippingAddress = {
+                    name: session.shipping_details.name,
+                    line1: session.shipping_details.address.line1,
+                    line2: session.shipping_details.address.line2,
+                    city: session.shipping_details.address.city,
+                    state: session.shipping_details.address.state,
+                    postal_code: session.shipping_details.address.postal_code,
+                    country: session.shipping_details.address.country
+                };
+                console.log('📦 Adresse de livraison extraite:', updateData.shippingAddress);
+            }
+
+            // Extraire le numéro de téléphone si disponible
+            if (session.customer_details?.phone) {
+                updateData.phoneNumber = session.customer_details.phone;
+                console.log('📞 Numéro de téléphone:', updateData.phoneNumber);
+            }
+
+            // Étape 1: Activer l'abonnement et sauvegarder l'adresse
             const user = await User.findOneAndUpdate(
                 { stripeCustomerId: session.customer },
-                {
-                    stripeSubscriptionId: session.subscription,
-                    subscriptionStatus: 'active'
-                },
+                updateData,
                 { new: true }
             );
 
             if (user) {
-                console.log(`✅ Abonnement activé (sans date) pour: ${user.email}. En attente de la facture.`);
+                console.log(`✅ Abonnement activé pour: ${user.email}. En attente de la facture.`);
+                if (!isRenewal && updateData.shippingAddress) {
+                    console.log(`📦 ⚠️  LIVRAISON REQUISE pour: ${user.email}`);
+                    console.log(`   Nom: ${updateData.shippingAddress.name}`);
+                    console.log(`   Adresse: ${updateData.shippingAddress.line1}, ${updateData.shippingAddress.city}, ${updateData.shippingAddress.country}`);
+                }
             } else {
                 console.error(`❌ checkout.session.completed: Aucun utilisateur trouvé avec le customerId: ${session.customer}`);
             }

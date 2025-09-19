@@ -7,4 +7,7 @@ const protect = require('../middleware/authMiddleware.js');
 // can access their own profile.
 router.route('/profile').get(protect, userController.getUserProfile);
 
+// Endpoint pour récupérer toutes les adresses de livraison (admin)
+router.route('/shipping-addresses').get(protect, userController.getShippingAddresses);
+
 module.exports = router;

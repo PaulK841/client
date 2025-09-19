@@ -42,7 +42,19 @@ const userSchema = mongoose.Schema(
       type: String,
       unique: true,
       sparse: true
-    }
+    },
+    // Adresse de livraison pour le matériel
+    shippingAddress: {
+      name: String,
+      line1: String,
+      line2: String,
+      city: String,
+      state: String,
+      postal_code: String,
+      country: String
+    },
+    // Numéro de téléphone pour la livraison
+    phoneNumber: String
   },
   {
     timestamps: true,
