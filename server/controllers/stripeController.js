@@ -137,14 +137,24 @@ const handleWebhook = async (req, res) => {
     switch (event.type) {
         case 'checkout.session.completed':
             const session = event.data.object;
-            const user = await User.findOne({ stripeCustomerId: session.customer });
+            // On récupère la souscription complète pour avoir la date de fin
+            const subscription = await stripe.subscriptions.retrieve(session.subscription);
+            
+            const user = await User.findOneAndUpdate(
+                { stripeCustomerId: session.customer },
+                {
+                    stripeSubscriptionId: session.subscription,
+                    subscriptionStatus: 'active',
+                    // On met à jour la date d'expiration immédiatement
+                    subscriptionExpiresAt: new Date(subscription.current_period_end * 1000)
+                },
+                { new: true }
+            );
             
             if (user) {
-                user.stripeSubscriptionId = session.subscription;
-                user.subscriptionStatus = 'active';
-                // La date d'expiration sera gérée par l'événement 'invoice.payment_succeeded'
-                await user.save();
-                console.log(`✅ Abonnement activé pour l'utilisateur: ${user.email}`);
+                console.log(`✅ Abonnement activé et date mise à jour pour: ${user.email}`);
+            } else {
+                console.error(`❌ checkout.session.completed: Aucun utilisateur trouvé avec le customerId: ${session.customer}`);
             }
             break;
 
@@ -152,60 +162,73 @@ const handleWebhook = async (req, res) => {
             const invoice = event.data.object;
             const subscriptionId = invoice.subscription;
             
-            // La période de l'abonnement est en secondes, on la convertit en millisecondes
+            if (!subscriptionId) {
+                console.log("-> Webhook invoice.payment_succeeded sans ID d'abonnement. Ignoré.");
+                break;
+            }
+
             const periodEnd = new Date(invoice.lines.data[0].period.end * 1000);
             
-            await User.findOneAndUpdate(
+            const updatedUser = await User.findOneAndUpdate(
                 { stripeSubscriptionId: subscriptionId },
                 { 
                     subscriptionStatus: 'active',
                     subscriptionExpiresAt: periodEnd 
-                }
+                },
+                { new: true }
             );
-            console.log(`✅ Date d'expiration mise à jour pour l'abonnement: ${subscriptionId}`);
+
+            if (updatedUser) {
+                console.log(`✅ Date d'expiration renouvelée pour: ${updatedUser.email}`);
+            } else {
+                console.error(`❌ invoice.payment_succeeded: Aucun utilisateur trouvé avec l'ID d'abonnement ${subscriptionId}`);
+            }
             break;
 
         case 'customer.subscription.deleted':
-            const subscription = event.data.object;
+            const deletedSubscription = event.data.object;
             await User.findOneAndUpdate(
-                { stripeSubscriptionId: subscription.id },
-                { 
-                    subscriptionStatus: 'cancelled',
-                    // On peut garder la date d'expiration pour savoir jusqu'à quand ils avaient accès
-                }
+                { stripeSubscriptionId: deletedSubscription.id },
+                { subscriptionStatus: 'cancelled' }
             );
-            console.log(`🔌 Abonnement annulé: ${subscription.id}`);
+            console.log(`🔌 Abonnement annulé: ${deletedSubscription.id}`);
             break;
 
         default:
-            console.log(`Événement webhook non géré: ${event.type}`);
+            console.log(`-> Événement webhook non géré: ${event.type}`);
     }
 
     res.json({ received: true });
 };
 
 
-// Vérifier le statut du paiement
+// Vérifier le statut du paiement ET METTRE À JOUR L'UTILISATEUR
 const verifyPayment = async (req, res) => {
     try {
         const { sessionId } = req.params;
-
         const session = await stripe.checkout.sessions.retrieve(sessionId);
 
         if (session.payment_status === 'paid') {
-            // Le paiement est réussi, mettre à jour l'utilisateur
+            // Logique de fallback : Mettre à jour l'utilisateur ici aussi
+            const user = await User.findOne({ stripeCustomerId: session.customer });
+            if (user && user.subscriptionStatus !== 'active') {
+                const subscription = await stripe.subscriptions.retrieve(session.subscription);
+                user.stripeSubscriptionId = session.subscription;
+                user.subscriptionStatus = 'active';
+                user.subscriptionExpiresAt = new Date(subscription.current_period_end * 1000);
+                await user.save();
+                console.log(`✅ (Fallback) Abonnement activé via la page de succès pour: ${user.email}`);
+            }
+
             res.json({ 
                 success: true, 
                 paymentStatus: 'paid',
-                customerEmail: session.customer_email,
+                customerEmail: session.customer_details.email,
                 amount: session.amount_total,
                 currency: session.currency
             });
         } else {
-            res.json({ 
-                success: false, 
-                paymentStatus: session.payment_status 
-            });
+            res.json({ success: false, paymentStatus: session.payment_status });
         }
     } catch (error) {
         console.error('Erreur vérification paiement:', error);

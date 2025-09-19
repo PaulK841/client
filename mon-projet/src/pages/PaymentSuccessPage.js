@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import API_BASE_URL from '../config/api';
+import { useAuth } from '../context/AuthContext';
 
 const PaymentSuccessPage = () => {
     const [searchParams] = useSearchParams();
@@ -11,6 +12,7 @@ const PaymentSuccessPage = () => {
     const [error, setError] = useState(null);
 
     const sessionId = searchParams.get('session_id');
+    const { refreshUserProfile } = useAuth();
 
     useEffect(() => {
         const verifyPayment = async () => {
@@ -26,7 +28,11 @@ const PaymentSuccessPage = () => {
                 if (response.data.success) {
                     setPaymentStatus('success');
                     setPaymentDetails(response.data);
-                    // User status update will be handled by the webhook
+                    
+                    // Rafraîchir les informations de l'utilisateur dans le contexte global
+                    await refreshUserProfile();
+                    console.log('User profile refreshed after successful payment verification.');
+
                 } else {
                     setPaymentStatus('failed');
                 }
@@ -38,7 +44,7 @@ const PaymentSuccessPage = () => {
         };
 
         verifyPayment();
-    }, [sessionId]);
+    }, [sessionId, refreshUserProfile]); // Ajouter refreshUserProfile aux dépendances
 
     const handleContinue = () => {
         navigate('/dashboard');
