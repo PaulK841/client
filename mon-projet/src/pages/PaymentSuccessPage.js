@@ -29,9 +29,15 @@ const PaymentSuccessPage = () => {
                     setPaymentStatus('success');
                     setPaymentDetails(response.data);
                     
-                    // Rafraîchir les informations de l'utilisateur dans le contexte global
+                    // Rafraîchir le profil plusieurs fois pour être sûr que les webhooks ont eu le temps
+                    console.log('Payment verified, refreshing user profile...');
                     await refreshUserProfile();
-                    console.log('User profile refreshed after successful payment verification.');
+                    
+                    // Rafraîchir encore une fois après 2 secondes (au cas où les webhooks ont du retard)
+                    setTimeout(async () => {
+                        console.log('Second profile refresh after webhook delay...');
+                        await refreshUserProfile();
+                    }, 2000);
 
                 } else {
                     setPaymentStatus('failed');
@@ -44,7 +50,7 @@ const PaymentSuccessPage = () => {
         };
 
         verifyPayment();
-    }, [sessionId, refreshUserProfile]); // Ajouter refreshUserProfile aux dépendances
+    }, [sessionId, refreshUserProfile]);
 
     const handleContinue = () => {
         navigate('/dashboard');
