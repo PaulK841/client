@@ -120,7 +120,7 @@ const ProfilePage = () => {
               <div className="profile-actions">
                 <h2>Renew Your Subscription</h2>
                 <p>Your access has expired. Renew now for <strong>€9.99</strong> to continue using the software.</p>
-                <Link to="/pricing" className="auth-button">Renew Now</Link>
+                <Link to="/renewal" className="auth-button">Renew Now</Link>
               </div>
             ) : (
               <div className="profile-actions">

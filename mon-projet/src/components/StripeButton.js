@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import API_BASE_URL from '../config/api';
 
-const StripeButton = ({ setupFeePriceId, subscriptionPriceId, productName, amount, onSuccess, onError }) => {
+const StripeButton = ({ setupFeePriceId, subscriptionPriceId, productName, amount, isRenewal = false, onSuccess, onError }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -16,10 +16,18 @@ const StripeButton = ({ setupFeePriceId, subscriptionPriceId, productName, amoun
                 throw new Error('You must be logged in to make a payment.');
             }
 
-            const response = await axios.post(`${API_BASE_URL}/api/stripe/create-session`, {
-                setupFeePriceId: setupFeePriceId,
+            // Pour les renouvellements, on n'envoie pas de setupFeePriceId
+            const payload = {
                 subscriptionPriceId: subscriptionPriceId,
-            }, {
+                isRenewal: isRenewal
+            };
+            
+            // Ajouter les frais de matériel seulement si ce n'est pas un renouvellement
+            if (!isRenewal && setupFeePriceId) {
+                payload.setupFeePriceId = setupFeePriceId;
+            }
+
+            const response = await axios.post(`${API_BASE_URL}/api/stripe/create-session`, payload, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -42,7 +50,7 @@ const StripeButton = ({ setupFeePriceId, subscriptionPriceId, productName, amoun
         <div className="stripe-payment">
             <button 
                 onClick={handlePayment}
-                disabled={loading || !setupFeePriceId.startsWith('price_') || !subscriptionPriceId.startsWith('price_')}
+                disabled={loading || (!isRenewal && !setupFeePriceId?.startsWith('price_')) || !subscriptionPriceId.startsWith('price_')}
                 className={`stripe-button ${loading ? 'loading' : ''}`}
             >
                 {loading ? (
@@ -58,7 +66,7 @@ const StripeButton = ({ setupFeePriceId, subscriptionPriceId, productName, amoun
                 )}
             </button>
             
-            {(!setupFeePriceId.startsWith('price_') || !subscriptionPriceId.startsWith('price_')) && (
+            {((!isRenewal && !setupFeePriceId?.startsWith('price_')) || !subscriptionPriceId.startsWith('price_')) && (
                  <div className="error-message">
                     Stripe is not configured. Please replace the placeholder IDs.
                 </div>

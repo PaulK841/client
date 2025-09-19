@@ -16,6 +16,7 @@ import DashboardPage from './pages/DashboardPage';
 import ProfilePage from './pages/ProfilePage';
 import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import PaymentCancelPage from './pages/PaymentCancelPage';
+import RenewalPage from './pages/RenewalPage';
 
 function App() {
   return (
@@ -60,6 +61,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <PaymentCancelPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/renewal" 
+            element={
+              <ProtectedRoute>
+                <RenewalPage />
               </ProtectedRoute>
             } 
           />

@@ -31,11 +31,12 @@ const createSubscriptionSession = async (req, res) => {
         }
     }
 
-    // 2. Vérifier les IDs de prix reçus du frontend
-    const { subscriptionPriceId, setupFeePriceId } = req.body;
+        // 2. Vérifier les IDs de prix reçus du frontend
+        const { subscriptionPriceId, setupFeePriceId, isRenewal } = req.body;
     console.log('📥 IDs de prix reçus du frontend:');
     console.log('   - ID Abonnement:', subscriptionPriceId);
     console.log('   - ID Frais matériel:', setupFeePriceId);
+    console.log('   - Renouvellement:', isRenewal ? 'OUI' : 'NON');
 
     // 3. Vérifier l'URL client pour la redirection
     const clientUrl = process.env.CLIENT_URL;
@@ -78,23 +79,29 @@ const createSubscriptionSession = async (req, res) => {
             await user.save();
         }
 
+        // Créer les line_items en fonction du type de paiement
+        const lineItems = [
+            // L'abonnement mensuel (toujours présent)
+            {
+                price: subscriptionPriceId,
+                quantity: 1,
+            }
+        ];
+
+        // Ajouter les frais de matériel seulement si ce n'est pas un renouvellement
+        if (!isRenewal && setupFeePriceId) {
+            lineItems.push({
+                price: setupFeePriceId,
+                quantity: 1,
+            });
+        }
+
         // Créer la session Stripe en mode abonnement
         const session = await stripe.checkout.sessions.create({
             mode: 'subscription',
             customer: customerId,
             payment_method_types: ['card'],
-            line_items: [
-                // L'abonnement mensuel
-                {
-                    price: subscriptionPriceId,
-                    quantity: 1,
-                },
-                // Les frais d'installation uniques
-                {
-                    price: setupFeePriceId,
-                    quantity: 1,
-                },
-            ],
+            line_items: lineItems,
             success_url: `${process.env.CLIENT_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `${process.env.CLIENT_URL}/payment-cancel`,
             metadata: {
