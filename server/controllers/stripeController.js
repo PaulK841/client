@@ -137,24 +137,36 @@ const handleWebhook = async (req, res) => {
     switch (event.type) {
         case 'checkout.session.completed':
             const session = event.data.object;
-            // On récupère la souscription complète pour avoir la date de fin
-            const subscription = await stripe.subscriptions.retrieve(session.subscription);
-            
-            const user = await User.findOneAndUpdate(
-                { stripeCustomerId: session.customer },
-                {
-                    stripeSubscriptionId: session.subscription,
-                    subscriptionStatus: 'active',
-                    // On met à jour la date d'expiration immédiatement
-                    subscriptionExpiresAt: new Date(subscription.current_period_end * 1000)
-                },
-                { new: true }
-            );
-            
-            if (user) {
-                console.log(`✅ Abonnement activé et date mise à jour pour: ${user.email}`);
-            } else {
-                console.error(`❌ checkout.session.completed: Aucun utilisateur trouvé avec le customerId: ${session.customer}`);
+            console.log('-> Traitement de checkout.session.completed pour le client:', session.customer);
+
+            try {
+                const subscription = await stripe.subscriptions.retrieve(session.subscription);
+                const expirationDate = new Date(subscription.current_period_end * 1000);
+
+                console.log(`   Date de fin de période extraite de Stripe: ${subscription.current_period_end} -> ${expirationDate}`);
+
+                if (isNaN(expirationDate.getTime())) {
+                    console.error('❌ ERREUR: La date d\'expiration calculée est invalide.');
+                    throw new Error('Invalid expiration date from Stripe.');
+                }
+
+                const user = await User.findOneAndUpdate(
+                    { stripeCustomerId: session.customer },
+                    {
+                        stripeSubscriptionId: session.subscription,
+                        subscriptionStatus: 'active',
+                        subscriptionExpiresAt: expirationDate
+                    },
+                    { new: true }
+                );
+                
+                if (user) {
+                    console.log(`✅ Abonnement activé et date mise à jour pour: ${user.email}`);
+                } else {
+                    console.error(`❌ checkout.session.completed: Aucun utilisateur trouvé avec le customerId: ${session.customer}`);
+                }
+            } catch (error) {
+                console.error('❌ ERREUR lors du traitement de checkout.session.completed:', error.message);
             }
             break;
 
