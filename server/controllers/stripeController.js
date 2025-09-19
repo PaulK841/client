@@ -105,16 +105,33 @@ const createSubscriptionSession = async (req, res) => {
  * Gère les webhooks entrants de Stripe pour mettre à jour la base de données.
  */
 const handleWebhook = async (req, res) => {
+    // --- CODE DE DÉBOGAGE AJOUTÉ ---
+    console.log('\n========================================');
+    console.log('🔔 Webhook Stripe reçu !');
+    console.log('========================================');
+    
     const sig = req.headers['stripe-signature'];
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!webhookSecret) {
+        console.error('❌ ERREUR FATALE : La variable STRIPE_WEBHOOK_SECRET est manquante !');
+        return res.status(400).send('Webhook secret not configured.');
+    } else {
+        console.log('✅ Secret de webhook chargé.');
+    }
+    
     let event;
 
     try {
         event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+        console.log(`✅ Signature du webhook vérifiée. Événement: ${event.type}`);
     } catch (err) {
-        console.error(`❌ Erreur Webhook Stripe: ${err.message}`);
+        console.error(`❌ ERREUR Signature Webhook Stripe: ${err.message}`);
         return res.status(400).send(`Webhook Error: ${err.message}`);
     }
+    
+    console.log('🪝 Traitement de l\'événement:', event.type);
+    // --- FIN DU CODE DE DÉBOGAGE ---
 
     // Gérer les événements spécifiques
     switch (event.type) {
