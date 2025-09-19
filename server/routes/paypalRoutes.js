@@ -9,7 +9,6 @@ router.post('/orders', protect, paypalController.createOrder); // 'createOrder' 
 // La capture n'est plus utilisée de la même manière, mais on garde une route pour la compatibilité
 router.post('/orders/:orderID/capture', protect, paypalController.captureOrder);
 
-// Route pour le webhook PayPal (publique)
-router.post('/webhook', paypalController.handleWebhook);
+// La route pour le webhook PayPal est maintenant gérée directement dans server.js
 
 module.exports = router;

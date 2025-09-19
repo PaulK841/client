@@ -5,6 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/db.js');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware.js');
+const bodyParser = require('body-parser'); // Importer body-parser
 
 // Importer les routes
 const authRoutes = require('./routes/authRoutes.js');
@@ -20,10 +21,9 @@ const app = express();
 // Middlewares de base
 app.use(cors());
 
-// IMPORTANT : Le webhook de Stripe a besoin du 'raw body', donc ce middleware
-// doit être placé AVANT express.json().
-// On utilise une expression régulière pour matcher /api/stripe/webhook ou /api/paypal/webhook
-app.use(/\/api\/(stripe|paypal)\/webhook/, express.raw({ type: 'application/json' }));
+// Utiliser bodyParser.raw pour les webhooks
+app.post('/api/stripe/webhook', bodyParser.raw({ type: 'application/json' }), require('./controllers/stripeController').handleWebhook);
+app.post('/api/paypal/webhook', bodyParser.raw({ type: 'application/json' }), require('./controllers/paypalController').handleWebhook);
 
 app.use(express.json());
 

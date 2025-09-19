@@ -7,8 +7,7 @@ const protect = require('../middleware/authMiddleware');
 router.get('/products', stripeController.getProducts);
 router.get('/verify-payment/:sessionId', stripeController.verifyPayment);
 
-// Route pour le webhook Stripe (ne doit pas être protégée par JWT car c'est Stripe qui appelle)
-router.post('/webhook', stripeController.handleWebhook);
+// La route du webhook est maintenant gérée directement dans server.js
 
 // Routes protégées (nécessitent une authentification de l'utilisateur)
 router.post('/create-session', protect, stripeController.createPaymentSession);
