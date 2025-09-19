@@ -5,6 +5,14 @@ const User = require('../models/User'); // Assurez-vous d'importer le modèle Us
  * Crée une session de paiement Stripe pour un ABONNEMENT avec frais d'installation.
  */
 const createSubscriptionSession = async (req, res) => {
+    // --- DEBUG: VÉRIFIER QUE LA REQUÊTE ARRIVE ---
+    console.log('\n🚀 === REQUÊTE STRIPE REÇUE ===');
+    console.log('Timestamp:', new Date().toISOString());
+    console.log('User ID:', req.user?.id);
+    console.log('Body:', req.body);
+    console.log('Origin:', req.headers.origin);
+    console.log('==================================');
+    
     // --- CODE DE DÉBOGAGE AJOUTÉ ---
     console.log('\n========================================');
     console.log('🏁 Tentative de création de session Stripe...');

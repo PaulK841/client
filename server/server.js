@@ -45,4 +45,17 @@ app.use(notFound);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  
+  // === DEBUG VARIABLES D'ENVIRONNEMENT ===
+  console.log('\n🔍 === VÉRIFICATION VARIABLES D\'ENVIRONNEMENT ===');
+  console.log('NODE_ENV:', process.env.NODE_ENV);
+  console.log('PORT:', process.env.PORT);
+  console.log('CLIENT_URL:', process.env.CLIENT_URL);
+  console.log('MONGODB_URI:', process.env.MONGODB_URI ? '✅ Définie' : '❌ Manquante');
+  console.log('JWT_SECRET:', process.env.JWT_SECRET ? '✅ Définie' : '❌ Manquante');
+  console.log('STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY ? `✅ ${process.env.STRIPE_SECRET_KEY.substring(0, 11)}...` : '❌ Manquante');
+  console.log('STRIPE_WEBHOOK_SECRET:', process.env.STRIPE_WEBHOOK_SECRET ? '✅ Définie' : '❌ Manquante');
+  console.log('=================================================\n');
+});
