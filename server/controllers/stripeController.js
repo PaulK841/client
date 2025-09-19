@@ -137,63 +137,64 @@ const handleWebhook = async (req, res) => {
     switch (event.type) {
         case 'checkout.session.completed':
             const session = event.data.object;
-            console.log('-> Traitement de checkout.session.completed pour le client:', session.customer);
+            console.log('-> checkout.session.completed pour le client:', session.customer);
 
-            try {
-                const subscription = await stripe.subscriptions.retrieve(session.subscription);
-                const expirationDate = new Date(subscription.current_period_end * 1000);
+            // Étape 1: Activer l'abonnement sans date de fin.
+            const user = await User.findOneAndUpdate(
+                { stripeCustomerId: session.customer },
+                {
+                    stripeSubscriptionId: session.subscription,
+                    subscriptionStatus: 'active'
+                },
+                { new: true }
+            );
 
-                console.log(`   Date de fin de période extraite de Stripe: ${subscription.current_period_end} -> ${expirationDate}`);
-
-                if (isNaN(expirationDate.getTime())) {
-                    console.error('❌ ERREUR: La date d\'expiration calculée est invalide.');
-                    throw new Error('Invalid expiration date from Stripe.');
-                }
-
-                const user = await User.findOneAndUpdate(
-                    { stripeCustomerId: session.customer },
-                    {
-                        stripeSubscriptionId: session.subscription,
-                        subscriptionStatus: 'active',
-                        subscriptionExpiresAt: expirationDate
-                    },
-                    { new: true }
-                );
-                
-                if (user) {
-                    console.log(`✅ Abonnement activé et date mise à jour pour: ${user.email}`);
-                } else {
-                    console.error(`❌ checkout.session.completed: Aucun utilisateur trouvé avec le customerId: ${session.customer}`);
-                }
-            } catch (error) {
-                console.error('❌ ERREUR lors du traitement de checkout.session.completed:', error.message);
+            if (user) {
+                console.log(`✅ Abonnement activé (sans date) pour: ${user.email}. En attente de la facture.`);
+            } else {
+                console.error(`❌ checkout.session.completed: Aucun utilisateur trouvé avec le customerId: ${session.customer}`);
             }
             break;
 
         case 'invoice.payment_succeeded':
             const invoice = event.data.object;
-            const subscriptionId = invoice.subscription;
+            console.log('-> invoice.payment_succeeded pour l\'abonnement:', invoice.subscription);
             
-            if (!subscriptionId) {
-                console.log("-> Webhook invoice.payment_succeeded sans ID d'abonnement. Ignoré.");
+            // Ignorer les factures qui ne sont pas liées à un abonnement
+            if (!invoice.subscription) {
+                console.log("   -> Facture sans ID d'abonnement. Ignorée.");
                 break;
             }
 
+            // Étape 2: Mettre à jour la date de fin. C'est la source de vérité.
             const periodEnd = new Date(invoice.lines.data[0].period.end * 1000);
-            
+
+            if (isNaN(periodEnd.getTime())) {
+                console.error('❌ ERREUR: La date d\'expiration de la facture est invalide.');
+                break;
+            }
+
             const updatedUser = await User.findOneAndUpdate(
-                { stripeSubscriptionId: subscriptionId },
+                { stripeSubscriptionId: invoice.subscription },
                 { 
-                    subscriptionStatus: 'active',
                     subscriptionExpiresAt: periodEnd 
                 },
                 { new: true }
             );
 
             if (updatedUser) {
-                console.log(`✅ Date d'expiration renouvelée pour: ${updatedUser.email}`);
+                console.log(`✅ Date d'expiration mise à jour pour: ${updatedUser.email} -> ${periodEnd.toLocaleDateString()}`);
             } else {
-                console.error(`❌ invoice.payment_succeeded: Aucun utilisateur trouvé avec l'ID d'abonnement ${subscriptionId}`);
+                // C'est possible si l'utilisateur est créé via checkout.session.completed
+                // On essaie de le trouver via le customerId
+                const userByCustomer = await User.findOne({ stripeCustomerId: invoice.customer });
+                if (userByCustomer) {
+                    userByCustomer.subscriptionExpiresAt = periodEnd;
+                    await userByCustomer.save();
+                    console.log(`✅ (Fallback Customer) Date d'expiration mise à jour pour: ${userByCustomer.email} -> ${periodEnd.toLocaleDateString()}`);
+                } else {
+                    console.error(`❌ invoice.payment_succeeded: Aucun utilisateur trouvé ni avec l'ID d'abonnement ${invoice.subscription} ni avec le customerId ${invoice.customer}`);
+                }
             }
             break;
 

@@ -20,7 +20,8 @@ const userSchema = mongoose.Schema(
     },
     // ON GARDE UNIQUEMENT CE CHAMP POUR L'ABONNEMENT
     subscriptionExpiresAt: {
-      type: Date, // Stocke la date exacte d'expiration
+      type: Date,
+      required: false, // On le rend non-requis
     },
     subscriptionStatus: {
       type: String,
